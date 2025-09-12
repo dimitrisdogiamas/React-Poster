@@ -10,6 +10,13 @@ function PostList({ isPosting, onStopPosting }) {
 
 // this function should be triggered when we submit the form in NewPost component
   function addPostHandler(postData) {
+    fetch('https://localhost:8080/posts', {
+      method: 'POST',
+      body: JSON.stringify(postData),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
     setPosts((prevPosts) => [postData, ...prevPosts]);
   }
   return (
@@ -22,9 +29,20 @@ function PostList({ isPosting, onStopPosting }) {
           />
         </Modal>
       ) : false}
-      <ul className={classes.posts}>
-        <Post />
-      </ul>
+      {posts.length > 0 && (
+        <ul className={classes.posts}>
+          {posts.map((post) => <Post key={post.body} author={post.author} body={post.body} />
+          )}
+        </ul>
+      )}
+      {posts.length === 0 && <div style={{
+        textAlign: 'center',
+        color: 'white',
+      }}>
+        <p><em>No posts yet</em></p>
+        <p>Click on New post to add Some!</p>
+      </div>
+      }
     </>
   )
 }
