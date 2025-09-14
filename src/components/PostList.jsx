@@ -3,14 +3,23 @@ import Modal from './Modal'
 import NewPost from './NewPost'
 import Post from './Post'
 import classes from './PostList.module.css'
-
+import { useEffect } from 'react';
 function PostList({ isPosting, onStopPosting }) {
 
   const [posts, setPosts] = useState([]);
 
+
+  useEffect(() => {
+   async function fetchPosts() {
+     const response = await fetch('http://localhost:8080/posts')
+         const reponseData = await response.json()
+          setPosts(reponseData);
+      }
+      fetchPosts();
+  }, []);
 // this function should be triggered when we submit the form in NewPost component
   function addPostHandler(postData) {
-    fetch('https://localhost:8080/posts', {
+    fetch('http://localhost:8080/posts', {
       method: 'POST',
       body: JSON.stringify(postData),
       headers: {
