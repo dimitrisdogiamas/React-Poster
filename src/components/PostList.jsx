@@ -6,17 +6,19 @@ import classes from './PostList.module.css'
 import { useEffect } from 'react';
 function PostList({ isPosting, onStopPosting }) {
 
-  const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-
-  useEffect(() => {
-   async function fetchPosts() {
-     const response = await fetch('http://localhost:8080/posts')
-         const reponseData = await response.json()
-          setPosts(reponseData);
-      }
-      fetchPosts();
-  }, []);
+    useEffect(() => {
+     async function fetchPosts() {
+        setIsLoading(true);
+         const response = await fetch('http://localhost:8080/posts')
+         const resData = await response.json();
+            setPosts(resData.posts);
+            setIsLoading(false);
+        }
+        fetchPosts();
+    }, []);
 // this function should be triggered when we submit the form in NewPost component
   function addPostHandler(postData) {
     fetch('http://localhost:8080/posts', {
@@ -26,7 +28,7 @@ function PostList({ isPosting, onStopPosting }) {
         'Content-Type': 'application/json',
       }
     })
-    setPosts((prevPosts) => [postData, ...prevPosts]);
+    setPosts((existingPosts) => [postData, ...existingPosts]);
   }
   return (
     <>
@@ -38,20 +40,26 @@ function PostList({ isPosting, onStopPosting }) {
           />
         </Modal>
       ) : false}
-      {posts.length > 0 && (
+      {!isLoading && posts.length > 0 && (
         <ul className={classes.posts}>
           {posts.map((post) => <Post key={post.body} author={post.author} body={post.body} />
           )}
         </ul>
       )}
-      {posts.length === 0 && <div style={{
+      {!isLoading && posts.length === 0 && <div style={{
         textAlign: 'center',
         color: 'white',
       }}>
-        <p><em>No posts yet</em></p>
+        <h2>There are no posts yet!</h2>
         <p>Click on New post to add Some!</p>
       </div>
       }
+
+        {isLoading && (
+            <div style={{textAlign: 'center', color: 'white'}}>
+                <p>Loading...</p>
+            </div>
+        )}
     </>
   )
 }
