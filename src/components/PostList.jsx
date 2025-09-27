@@ -8,15 +8,29 @@ function PostList({ isPosting, onStopPosting }) {
 
     const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
      async function fetchPosts() {
-        setIsLoading(true);
-         const response = await fetch('http://localhost:8080/posts')
-         const resData = await response.json();
-            setPosts(resData.posts);
-            setIsLoading(false);
-        }
+         setIsLoading(true);
+         setError(null);
+         try {
+
+             const response = await fetch('http://localhost:8080/posts');
+             if (!response.ok) {
+                 throw new Error('Something went wrong!');
+             }
+             const resData = await response.json();
+             setPosts(resData.posts);
+
+         } catch
+             (error) {
+             setError(error.message);
+         } finally {
+             setIsLoading(false);
+         }
+     }
+
         fetchPosts();
     }, []);
 // this function should be triggered when we submit the form in NewPost component
@@ -58,6 +72,12 @@ function PostList({ isPosting, onStopPosting }) {
         {isLoading && (
             <div style={{textAlign: 'center', color: 'white'}}>
                 <p>Loading...</p>
+            </div>
+        )}
+
+        {error && (
+            <div style={{textAlign: 'center', color: 'red'}}>
+                <p>Error: {error}</p>
             </div>
         )}
     </>
